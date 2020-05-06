@@ -8,8 +8,6 @@ class HotelBooking(models.Model):
     postal_code = models.IntegerField()
     latitude = models.FloatField()
     longitude = models.FloatField()
-    email = models.EmailField(max_length=254, blank=True, null=True)
-    phone_number = models.CharField(max_length=50, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=False, default=timezone.now)
 
     def __str__(self):

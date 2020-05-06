@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     # Third party apps
     'rest_framework',
+    'drf_yasg',
 
 ]
 
@@ -130,3 +131,10 @@ CATEGORY = 'hotel'
 
 django_heroku.settings(locals())
 # https://places.cit.api.here.com/places/v1/categories/places/museum
+
+REST_FRAMEWORK = {
+
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+
+
+}

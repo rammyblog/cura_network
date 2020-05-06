@@ -58,6 +58,13 @@ class ListHotels(views.APIView):
 
 
 class HotelBookingsCreate(generics.CreateAPIView):
+    """
+          Create am hotel booking using the property ID from HERE places.
+
+          * i.e here:pds:place:276u0vhj-b0bace6448ae4b0fbc1d5e323998a7d2
+
+    """
+
     serializer_class = HotelBookingSerializer
 
     @staticmethod
@@ -93,6 +100,9 @@ class HotelBookingsCreate(generics.CreateAPIView):
 
         return request_data
 
+    def perform_create(self, serializer, request_data):
+        serializer.save(postal_code=request_data['postal_code'], hotel_name=request_data['hotel_name'],  latitude=request_data['latitude'], longitude=request_data['longitude'] )
+
     def create(self, request, *args, **kwargs):
         try:
             hotel_id = request.data['hotel_id']
@@ -107,12 +117,12 @@ class HotelBookingsCreate(generics.CreateAPIView):
         request_data = self.get_hotel_data_dict(hotel_data)
         serializer = self.get_serializer(data=request_data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+        self.perform_create(serializer, request_data)
         headers = self.get_success_headers(serializer.data)
 
         context_data = {
             'message': 'success',
-            'data': serializer.data
+            'data': request_data
         }
         return Response(context_data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -121,7 +131,6 @@ class HotelBookingsList(generics.ListAPIView):
     serializer_class = HotelBookingSerializer
 
     def get_queryset(self, id):
-        # id = self.request.get['PROPERTY_ID']
         return HotelBooking.objects.filter(hotel_id=id)
 
     def list(self, request, **kwargs):

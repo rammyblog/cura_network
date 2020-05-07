@@ -13,11 +13,11 @@ class PropertyTests(APITestCase):
         Ensure we can create a new booking object and get the booking count for that booking.
         """
         url = reverse('create_booking')
-        data = {'hotel_id': 'here:pds:place:840drt2y-3108ffe3c27b42d1ac86c8938c523f68'}
+        data = {'property_id': 'here:pds:place:840drt2y-3108ffe3c27b42d1ac86c8938c523f68'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(HotelBooking.objects.count(), 1)
-        self.assertEqual(HotelBooking.objects.get().hotel_id,
+        self.assertEqual(HotelBooking.objects.get().property_id,
                          'here:pds:place:840drt2y-3108ffe3c27b42d1ac86c8938c523f68')
 
     def test_count_booking(self):
@@ -28,7 +28,7 @@ class PropertyTests(APITestCase):
         create_booking_url = reverse('create_booking')
         booking_count_url = reverse('hotel_bookings_list',
                                     kwargs={'PROPERTY_ID': 'here:pds:place:840drt2y-3108ffe3c27b42d1ac86c8938c523f68'})
-        data = {'hotel_id': 'here:pds:place:840drt2y-3108ffe3c27b42d1ac86c8938c523f68'}
+        data = {'property_id': 'here:pds:place:840drt2y-3108ffe3c27b42d1ac86c8938c523f68'}
         create_response = self.client.post(create_booking_url, data, format='json')
         count_response = self.client.get(booking_count_url, format='json')
 
@@ -42,7 +42,7 @@ class PropertyTests(APITestCase):
         """
         response = self.client.get('/api/properties?at=42.36399,-71.1', format='json')
         test_dict = json.loads(response.content)
-        response_test_data = test_dict['items'][0]
+        response_test_data = test_dict['data']['items'][0]
         test_data = {'title': 'Boston Marriott Cambridge',
                      'id': 'here:pds:place:840drt2y-3108ffe3c27b42d1ac86c8938c523f68',
                      'resultType': 'place',

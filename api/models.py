@@ -3,15 +3,15 @@ from django.utils import timezone
 
 
 class HotelBooking(models.Model):
-    hotel_name = models.CharField(max_length=1000)
-    hotel_id = models.CharField(max_length=250)
+    property_name = models.CharField(max_length=1000)
+    property_id = models.CharField(max_length=250)
     postal_code = models.IntegerField()
     latitude = models.FloatField()
     longitude = models.FloatField()
     created_at = models.DateTimeField(auto_now_add=False, default=timezone.now)
 
     def __str__(self):
-        return f'{self.hotel_name} with ID: {self.hotel_id}'
+        return f'{self.property_name} with ID: {self.property_id}'
 
     class Meta:
 

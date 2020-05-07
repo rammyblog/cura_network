@@ -10,20 +10,17 @@ from api import views
 
 API_TITLE = 'Cura Network API'
 API_DESCRIPTION = 'A Web API for getting hotels in a region and booking hotels'
-# schema_view = get_schema_view(title=API_TITLE,
-#                               description=API_DESCRIPTION, public=True, authentication_classes=[], permission_classes=[], )
 
 schema_view = get_schema_view(
-   openapi.Info(
-      title=API_TITLE,
-      default_version='v1',
-      description=API_DESCRIPTION,
+    openapi.Info(
+        title=API_TITLE,
+        default_version='v1',
+        description=API_DESCRIPTION,
 
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
 )
-
 
 
 urlpatterns = [
@@ -31,5 +28,5 @@ urlpatterns = [
     path('', views.API_Root.as_view(), name='API Root'),
     path('api/', include('api.urls')),
     path('schema/', get_core_api_schema),
-    path('docs/', schema_view.with_ui('redoc', cache_timeout=0))
+    path('docs/', schema_view.with_ui('redoc', cache_timeout=0), name='api_docs')
 ]

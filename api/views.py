@@ -25,7 +25,7 @@ class API_Root(views.APIView):
             'list_properties': reverse('list_hotels', request=request, format=format),
             'create_booking': reverse('create_booking', request=request, format=format),
             'get_bookings_count': reverse('hotel_bookings_list', request=request, format=format, kwargs={'PROPERTY_ID': 'here:pds:place:276u0vhj-b0bace6448ae4b0fbc1d5e323998a7d2'}),
-
+            'API DOCS': reverse('api_docs', request=request, format=format)
 
         })
 

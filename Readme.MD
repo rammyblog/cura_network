@@ -21,6 +21,7 @@ $ cd cd cura_network
 $ virtualenv-3 venv
 $ source venv/bin/activate
 $ pip install -r requirements.txt
+$ python manage.py migrate
 $ python manage.py runserver
 ```
 
@@ -83,6 +84,13 @@ DATABASES = {
 
 }
 
+```
+
+After setting up your database and .env file run the following commands
+
+```sh
+$ python manage.py migrate
+$ python manage.py runserver
 ```
 
 ### [Read The Api Hosted Docs](https://curanetwork.herokuapp.com/docs/)

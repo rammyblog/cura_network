@@ -31,13 +31,14 @@ class ListHotels(views.APIView):
     """
     View to list all hotels in a given area.
 
-    * Requires the cordinates of the area i.e Longitude and Langtitude.
-    * 
+    * Requires the cordinates of the area i.e Longitude and Langtitude as parameter
+
     """
 
     @swagger_auto_schema(
         responses={404: "You need to include the at in the params i.e '&at=42.36399,-71.05493' "}, manual_parameters=[
-            openapi.Parameter('at', openapi.IN_QUERY, "LAT,LONG", type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter('at', openapi.IN_QUERY, "LAT,LONG",
+                              type=openapi.TYPE_STRING, required=True),
         ],
     )
     def get(self, request):
@@ -70,9 +71,16 @@ class ListHotels(views.APIView):
                 try:
                     response = requests.get(base_url, params=params).json()
                 except ConnectionError:
-                    raise serializers.ValidationError('Your internet seems to be very slow or bad')
-                request.session['hotels_data'] = response
-                request.session['cordinates'] = cordinates
+                    raise serializers.ValidationError(
+                        'Your internet seems to be very slow or bad')
+                try:
+                    if response['status'] == 404:
+                        raise serializers.ValidationError(
+                            'Wrong cordinates given')
+                except KeyError:
+
+                    request.session['hotels_data'] = response
+                    request.session['cordinates'] = cordinates
 
             hotels_data = request.session['hotels_data']
 
@@ -86,7 +94,7 @@ class ListHotels(views.APIView):
 
 class HotelBookingsCreate(views.APIView):
     """
-          Create an hotel booking using the property ID from HERE places.
+       Create an hotel booking sending the property ID from HERE places as request body.
 
           * i.e here:pds:place:276u0vhj-b0bace6448ae4b0fbc1d5e323998a7d2
 
@@ -109,10 +117,12 @@ class HotelBookingsCreate(views.APIView):
             try:
                 response = requests.get(base_url, params=params).json()
             except ConnectionError:
-                raise serializers.ValidationError('Your internet seems to be very slow or bad')
+                raise serializers.ValidationError(
+                    'Your internet seems to be very slow or bad')
             try:
-                response['status'] = 404
-                raise serializers.ValidationError('Wrong Property ID given')
+                if response['status'] == 404:
+                    raise serializers.ValidationError(
+                        'Wrong Property ID given')
             except KeyError:
                 request.session['hotel_data'] = response
                 request.session['property_id'] = property_id
@@ -153,7 +163,8 @@ class HotelBookingsCreate(views.APIView):
                 "'here:pds:place:276u0vhj-b0bace6448ae4b0fbc1d5e323998a7d2' ",
                 status=status.HTTP_400_BAD_REQUEST)
 
-        hotel_data_json = self.get_hotel(property_id=property_id, request=request)
+        hotel_data_json = self.get_hotel(
+            property_id=property_id, request=request)
         hotel_data = load_and_dump_data(hotel_data_json)
         request_data = self.get_hotel_data_dict(hotel_data)
         serializer = HotelBookingSerializer(data=request.data)
@@ -169,18 +180,35 @@ class HotelBookingsCreate(views.APIView):
 
 class HotelBookingsList(views.APIView):
     """
-        Return the number of bookings per property the property ID from HERE places.
+        Return the number of bookings per property sending property ID from HERE places as params.
         * i.e here:pds:place:276u0vhj-b0bace6448ae4b0fbc1d5e323998a7d2
+
+        Sample response: 
+
+        {
+            'message': 'success',
+            'number_of_bookings': 1,
+            'data': [{
+            "id": 1,
+            "property_name": "Flughafen Frankfurt-Hahn",
+            "property_id": "here:pds:place:276u0vhj-b0bace6448ae4b0fbc1d5e323998a7d2",
+            "postal_code": 55483,
+            "latitude": 49.94802,
+            "longitude": 7.27153,
+            "created_at": "2020-05-06T21:28:37.856911Z"
+        }]
+        }
+
 
     """
 
-    def get_queryset(self, id):
-        return HotelBooking.objects.filter(property_id=id)
+    def get_queryset(self, property_id):
+        return HotelBooking.objects.filter(property_id__exact=property_id)
 
     @swagger_auto_schema(
         responses={200: HotelSerializer(many=True)})
     def get(self, request, **kwargs):
-        queryset = self.get_queryset(id=kwargs['PROPERTY_ID'])
+        queryset = self.get_queryset(property_id=kwargs['PROPERTY_ID'])
         serializer = HotelSerializer(queryset, many=True)
 
         context_data = {
